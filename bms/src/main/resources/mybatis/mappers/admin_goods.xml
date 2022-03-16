@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.admin.goods">
+	
+	<insert id="insertNewGoods" parameterType="hashmap">
+		<selectKey resultType="int" keyProperty="goodsId" order="BEFORE">
+	    	SELECT 
+	    			SEQ_GOODS_ID.NEXTVAL 
+	    	FROM 
+	    			DUAL
+	    </selectKey>
+		    INSERT INTO T_SHOPPING_GOODS (
+					GOODS_ID,
+					GOODS_TITLE,
+					GOODS_WRITER,
+					GOODS_PRICE,
+					GOODS_PUBLISHER,
+					GOODS_SORT,
+					GOODS_SALES_PRICE,
+					GOODS_POINT,
+					GOODS_PUBLISHED_DATE,
+					GOODS_TOTAL_PAGE,
+					GOODS_ISBN,
+					GOODS_DELIVERY_PRICE,
+					GOODS_DELIVERY_DATE,
+					GOODS_STATUS,
+					GOODS_WRITER_INTRO,
+					GOODS_CONTENTS_ORDER,
+					GOODS_INTRO,
+					GOODS_PUBLISHER_COMMENT,
+					GOODS_RECOMMENDATION,
+					GOODS_CREDATE		    
+		    )
+		    VALUES(
+			       #{goodsId},
+			       #{goodsTitle},
+			       #{goodsWriter},
+			       #{goodsPrice},
+			       #{goodsPublisher},
+			       #{goodsSort},
+			       #{goodsSalesPrice},
+			       #{goodsPoint},
+			       TO_DATE(#{goodsPublishedDate},'YYYY-MM-DD'),
+			       #{goodsTotalPage},
+			       #{goodsIsbn},
+			       #{goodsDeliveryPrice},
+			       TO_DATE(#{goodsDeliveryDate},'YYYY-MM-DD'),
+			       #{goodsStatus},
+			       #{goodsWriterIntro},
+		  	   	   #{goodsIntro},
+			       #{goodsContentsOrder},
+			       #{goodsPublisherComment},
+			       #{goodsRecommendation},	
+			       SYSDATE
+ 			 )
+	</insert> 
+	
+	<select id="selectMaxGoodsId" resultType="int">
+		SELECT
+				MAX(GOODS_ID)
+		FROM
+				T_SHOPPING_GOODS
+	</select>
+	
+	
+	<insert id="insertGoodsImageFile" parameterType="ImageFileDto">
+		<selectKey resultType="int" keyProperty="imageId" order="BEFORE">
+	    	SELECT 
+	    			SEQ_IMAGE_ID.NEXTVAL 
+	    	FROM 
+	    			DUAL
+	    </selectKey>
+	    INSERT INTO T_GOODS_DETAIL_IMAGE ( 
+	    	IMAGE_ID,
+	    	GOODS_ID,
+	    	FILE_NAME,
+	    	FILE_TYPE
+	    )
+	    VALUES (
+			#{imageId},
+		 	#{goodsId},
+			#{fileName},
+			#{fileType}
+		)
+	</insert> 
+	
+	
+	<select id="selectNewGoodsList" resultType="GoodsDto" parameterType="hashmap"  >
+		SELECT 
+	   		   GOODS_ID,
+	           GOODS_TITLE,
+	           GOODS_WRITER,
+	           GOODS_PUBLISHER,
+	           GOODS_PRICE,
+	           GOODS_CREDATE,
+	           GOODS_PUBLISHED_DATE
+	    FROM 
+			   T_SHOPPING_GOODS 
+     	<where> 
+                 TO_CHAR(GOODS_CREDATE,'YYYY-MM-DD') BETWEEN #{beginDate} AND #{endDate} 
+                 <if test='searchType == "all"'>
+                   AND (GOODS_ID          LIKE '%'|| #{searchWord} || '%'
+                   OR  GOODS_TITLE       LIKE '%'|| #{searchWord} || '%'
+                   OR  GOODS_WRITER       LIKE '%'|| #{searchWord} || '%'
+                   OR  GOODS_PUBLISHER    LIKE '%'|| #{searchWord} || '%')
+              </if>
+                 <if test='searchType == "goodsId"'>
+                   AND GOODS_ID LIKE '%'|| #{searchWord} || '%'
+              </if>
+                 <if test='searchType == "goodsTitle"'>
+                   AND GOODS_TITLE LIKE '%'|| #{searchWord} || '%'
+              </if>                           
+                 <if test='searchType == "goodsWriter"'>
+                   AND GOODS_WRITER LIKE '%'|| #{searchWord} || '%'
+              </if>                           
+                 <if test='searchType == "goodsPublisher"'>
+                   AND GOODS_PUBLISHER LIKE '%'|| #{searchWord} || '%'
+              </if>
+        </where>      			   
+
+        ORDER BY 
+          			GOODS_CREDATE DESC
+	</select>
+	
+	<resultMap type="hashmap" id="adminGoodsMap">
+		<result column="GOODS_ID" 		 			property="goodsId" />
+		<result column="GOODS_TITLE" 	 			property="goodsTitle" />
+		<result column="GOODS_WRITER" 	 			property="goodsWriter" />
+		<result column="GOODS_PRICE" 	 			property="goodsPrice" />
+		<result column="GOODS_PUBLISHER" 	 		property="goodsPublisher" />
+		<result column="GOODS_SORT" 	 			property="goodsSort" />
+		<result column="GOODS_SALES_PRICE" 	 		property="goodsSalesPrice" />
+		<result column="GOODS_POINT" 	 			property="goodsPoint" />
+		<result column="GOODS_PUBLISHED_DATE" 	 	property="goodsPublishedDate" />
+		<result column="GOODS_TOTAL_PAGE" 	 		property="goodsTotalPage" />
+		<result column="GOODS_ISBN" 				property="goodsIsbn" />
+		<result column="GOODS_DELIVERY_PRICE" 	 	property="goodsDeliveryPrice" />
+		<result column="GOODS_DELIVERY_DATE" 	 	property="goodsDeliveryDate" />
+		<result column="GOODS_STATUS" 	 			property="goodsStatus" />
+		<result column="GOODS_WRITER_INTRO" 		property="goodsWriterIntro"      jdbcType="CLOB" javaType="String"/>
+		<result column="GOODS_CONTENTS_ORDER" 	 	property="goodsContentsOrder" 	 jdbcType="CLOB" javaType="String"/>
+		<result column="GOODS_INTRO" 	 			property="goodsIntro" 			 jdbcType="CLOB" javaType="String"/>
+		<result column="GOODS_PUBLISHER_COMMENT" 	property="goodsPublisherComment" jdbcType="CLOB" javaType="String"/>
+		<result column="GOODS_RECOMMENDATION" 	 	property="goodsRecommendation" 	 jdbcType="CLOB" javaType="String"/>
+		<result column="GOODS_CREDATE" 		 		property="goodsCredate" />
+		<result column="FILE_NAME" 			 		property="goodsFileName" />
+	</resultMap>
+	
+		
+	<select id="selectGoodsDetail" resultMap="adminGoodsMap" parameterType="int" >
+	    SELECT 
+   				G.GOODS_ID					AS GOODS_ID,
+   				G.GOODS_TITLE				AS GOODS_TITLE,
+   				G.GOODS_WRITER				AS GOODS_WRITER,
+   				G.GOODS_PRICE				AS GOODS_PRICE,
+   				G.GOODS_PUBLISHER			AS GOODS_PUBLISHER,
+   				G.GOODS_SORT				AS GOODS_SORT,
+   				G.GOODS_SALES_PRICE			AS GOODS_SALES_PRICE,
+   				G.GOODS_POINT				AS GOODS_POINT,
+   				G.GOODS_PUBLISHED_DATE		AS GOODS_PUBLISHED_DATE,
+   				G.GOODS_TOTAL_PAGE			AS GOODS_TOTAL_PAGE,
+   				G.GOODS_ISBN 				AS GOODS_ISBN,
+   				G.GOODS_DELIVERY_PRICE 		AS GOODS_DELIVERY_PRICE,
+   				G.GOODS_DELIVERY_DATE 		AS GOODS_DELIVERY_DATE,
+   				G.GOODS_STATUS 				AS GOODS_STATUS,
+   				G.GOODS_WRITER_INTRO 		AS GOODS_WRITER_INTRO,
+   				G.GOODS_CONTENTS_ORDER 		AS GOODS_CONTENTS_ORDER,
+   				G.GOODS_INTRO 				AS GOODS_INTRO,
+   				G.GOODS_PUBLISHER_COMMENT 	AS GOODS_PUBLISHER_COMMENT,
+   				G.GOODS_RECOMMENDATION 		AS GOODS_RECOMMENDATION,
+   				G.GOODS_CREDATE 			AS GOODS_CREDATE,
+   				D.FILE_NAME					AS FILE_NAME 
+	    FROM 
+	    		T_SHOPPING_GOODS G 
+	    			  INNER JOIN T_GOODS_DETAIL_IMAGE D
+         					  ON G.GOODS_ID = D.GOODS_ID    
+         					 AND D.FILE_TYPE = 'main_image' 
+         					 AND G.GOODS_ID = #{goodsId}
+        ORDER BY 
+        		G.GOODS_ID
+	</select>
+	
+	
+	<select id="selectGoodsImageFileList" resultType="ImageFileDto" >
+    	SELECT 
+    			* 
+    	FROM  
+    			T_GOODS_DETAIL_IMAGE 
+    	WHERE  
+	    		GOODS_ID = #{goodsId}
+	    ORDER BY 
+	    		IMAGE_ID ASC
+	</select>	
+
+	
+	<update id="updateGoodsInfo" parameterType="map" >
+	   UPDATE T_SHOPPING_GOODS
+	    <set> 
+	      <if test='goodsSort != null and goodsSort != ""'>
+	        GOODS_SORT = #{goodsSort},
+	      </if>
+	      <if test='goodsTitle != null and goodsTitle != ""'>
+	        GOODS_TITLE = #{goodsTitle},
+	      </if>
+	      <if test='goodsWriter != null and goodsWriter != ""'>
+	        GOODS_WRITER = #{goodsWriter},
+	      </if>
+	      <if test='goodsPublisher != null and goodsPublisher != ""'>
+	        GOODS_PUBLISHER = #{goodsPublisher},
+	      </if>
+	      <if test='goodsPrice != null and goodsPrice != ""'>
+	        goods_price = #{goodsPrice},
+	      </if>
+	      <if test='goodsPublishedDate != null and goodsPublishedDate != ""'>
+	        GOODS_PUBLISHED_DATE = to_date(#{goodsPublishedDate},'YYYY-MM-DD'),
+	      </if>
+	      <if test='goodsSalesPrice != null and goodsSalesPrice != ""'>
+	        GOODS_SALES_PRICE = #{goodsSalesPrice},
+	      </if>
+	      <if test='goodsPoint != null and goodsPoint != ""'>
+	        GOODS_POINT = #{goodsPoint},
+	      </if>
+	      <if test='goodsTotalPage != null and goodsTotalPage != ""'>
+	        GOODS_TOTAL_PAGE = #{goodsTotalPage},
+	      </if>
+	      <if test='goodsIsbn != null and goodsIsbn != ""'>
+	        GOODS_ISBN = #{goodsIsbn},
+	      </if>
+	      <if test='goodsDeliveryPrice != null and goodsDeliveryPrice != ""'>
+	        GOODS_DELIVERY_PRICE = #{goodsDeliveryPrice},
+	      </if>
+	      <if test='goodsDeliveryDate != null and goodsDeliveryDate != ""'>
+	        GOODS_DELIVERY_DATE = TO_DATE(#{goodsDeliveryDate},'yyyy-MM-dd'),
+	      </if>
+	      <if test='goodsStatus != null and goodsStatus != ""'>
+	        GOODS_STATUS = #{goodsStatus},
+	      </if>
+	      <if test='goodsWriterIntro != null and goodsWriterIntro != ""'>
+	        GOODS_WRITER_INTRO = #{goodsWriterIntro},
+	      </if>
+	      <if test='goodsIntro != null and goodsIntro != ""'>
+	        GOODS_INTRO = #{goodsIntro},
+	      </if>
+	      <if test='goodsPublisherComment != null and goodsPublisherComment != ""'>
+	        GOODS_PUBLISHER_COMMENT = #{goodsPublisherComment},
+	      </if>
+	      <if test='goodsRecommendation != null and goodsRecommendation != ""'>
+	        GOODS_RECOMMENDATION = #{goodsRecommendation},
+	      </if>
+	      <if test='goodsContentsOrder != null and goodsContentsOrder != ""'>
+	        GOODS_CONTENTS_ORDER = #{goodsContentsOrder},
+      	  </if>
+	     </set>
+	   WHERE 
+	    	GOODS_ID = #{goodsId}
+	
+	</update>	
+	
+	
+	<update id="updateGoodsImage" parameterType="ImageFileDto">
+		UPDATE 
+				T_GOODS_DETAIL_IMAGE
+		SET 
+				FILE_NAME = #{fileName}
+		WHERE	 
+				GOODS_ID = #{goodsId} AND IMAGE_ID = #{imageId}
+	</update>
+	
+	
+	<delete id="deleteGoodsImage" parameterType="int">
+	  DELETE FROM 
+	  			T_GOODS_DETAIL_IMAGE
+	  WHERE 
+	  			IMAGE_ID = #{imageId}
+	</delete>
+		
+</mapper>

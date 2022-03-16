@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.admin.order">
+
+	<select id="selectNewOrderList" resultType="OrderDto" parameterType="hashMap"  >
+   		  SELECT  
+   					*  
+   		  FROM 
+   		  			T_SHOPPING_ORDER 
+         <where>
+          			TO_CHAR(PAY_ORDER_TIME,'yyyy-mm-dd') BETWEEN #{beginDate} AND #{endDate}
+	                <if test='searchType == "all"'>
+	                  AND (ORDERER_NAME 	like '%'|| #{searchWord} || '%'
+	                   OR GOODS_TITLE 	like '%'|| #{searchWord} || '%')
+	                </if>
+	                <if test='searchType == "ordererName"'>
+	                  AND ORDERER_NAME LIKE '%'|| #{searchWord} || '%'
+	                </if>
+	                <if test='searchType == "goodsTitle"'>
+	                   AND GOODS_TITLE LIKE '%'|| #{searchWord} || '%'
+	                </if>
+	      </where> 
+          ORDER BY 
+          			PAY_ORDER_TIME DESC
+	</select>
+	
+	
+	<update id="updateDeliveryState" parameterType="java.util.Map" >
+	   UPDATE T_SHOPPING_ORDER
+	    <set> 
+	      <if test='deliveryState != null and deliveryState != "" '>
+	        DELIVERY_STATE = #{deliveryState}
+	      </if>
+	    </set>
+	    WHERE 
+	    	ORDER_ID = #{orderId}
+	</update>
+		
+		
+	<resultMap type="hashMap" id="orderDetail">
+		<result column="GOODS_ID" 			  property="goodsId"/>
+		<result column="GOODS_TITLE" 		  property="goodsTitle"/>
+		<result column="GOODS_DELIVERY_PRICE" property="goodsDeliveryPrice"/>
+		<result column="ORDER_ID" 			  property="orderId"/>
+		<result column="ORDER_GOODS_QTY" 	  property="orderGoodsQty"/>
+		<result column="GOODS_SALES_PRICE"    property="goodsSalesPrice"/>
+		<result column="DELIVERY_METHOD" 	  property="deliveryMethod"/>
+		<result column="RECEIVER_NAME" 		  property="receiverName"/>
+		<result column="RECEIVER_HP1" 		  property="receiverHp1"/>
+		<result column="RECEIVER_HP2" 		  property="receiverHp2"/>
+		<result column="RECEIVER_HP3" 		  property="receiverHp3"/>
+		<result column="RECEIVER_TEL1" 		  property="receiverTel1"/>
+		<result column="RECEIVER_TEL2" 		  property="receiverTel2"/>
+		<result column="RECEIVER_TEL3" 		  property="receiverTel3"/>
+		<result column="DELIVERY_ADDRESS" 	  property="deliveryAddress"/>
+		<result column="DELIVERY_MESSAGE" 	  property="deliveryMessage"/>
+		<result column="GIFT_WRAPPING" 		  property="giftWrapping"/>
+		<result column="PAY_METHOD" 		  property="payMethod"/>
+		<result column="CARD_COM_NAME" 		  property="cardComName"/>
+		<result column="CARD_PAY_MONTH" 	  property="cardPayMonth"/>
+		<result column="DELIVERY_STATE" 	  property="deliveryState"/>
+		<result column="MEMBER_ID" 			  property="memberId"/>
+		<result column="MEMBER_NAME" 		  property="memberName"/>
+		<result column="HP1" 				  property="hp1"/>
+		<result column="HP2" 				  property="hp2"/>
+		<result column="HP3" 				  property="hp3"/>
+		<result column="EMAIL1" 			  property="email1"/>
+		<result column="EMAIL2" 			  property="email2"/>
+		<result column="FILE_NAME" 			  property="goodsFileName"/>
+	</resultMap>
+	
+    <select id="selectOrderDetail" resultMap="orderDetail" parameterType="int"  >
+	     SELECT 
+	    		G.GOODS_ID,
+	    		G.GOODS_TITLE,
+	    		G.GOODS_DELIVERY_PRICE,
+	    		O.ORDER_GOODS_QTY,
+	    		O.GOODS_SALES_PRICE,
+	    		O.ORDER_ID,
+	    		O.DELIVERY_METHOD,
+	    		O.RECEIVER_NAME,
+	    		O.RECEIVER_HP1,
+	    		O.RECEIVER_HP2,
+	    		O.RECEIVER_HP3,
+	    		O.RECEIVER_TEL1,
+	    		O.RECEIVER_TEL2,
+	    		O.RECEIVER_TEL3,
+	    		O.DELIVERY_ADDRESS,
+	    		O.DELIVERY_MESSAGE,
+	    		O.GIFT_WRAPPING,
+	    		O.PAY_METHOD,
+	    		O.CARD_COM_NAME,
+	    		O.CARD_PAY_MONTH,
+	    		O.DELIVERY_STATE,
+	    		M.MEMBER_ID,
+	    		M.MEMBER_NAME,
+	    		M.HP1,
+	    		M.HP2,
+	    		M.HP3,
+	    		M.EMAIL1,
+	    		M.EMAIL2,
+	    		D.FILE_NAME
+	    FROM 
+	    		T_SHOPPING_ORDER O
+	                  INNER JOIN T_SHOPPING_GOODS G
+	                          ON O.GOODS_ID = G.GOODS_ID
+	                  INNER JOIN T_GOODS_DETAIL_IMAGE D
+	                          ON G.GOODS_ID = D.GOODS_ID
+	                         AND D.FILE_TYPE = 'main_image'
+	                  INNER JOIN T_SHOPPING_MEMBER M
+	                		  ON O.MEMBER_ID = M.MEMBER_ID
+        WHERE 
+           		O.ORDER_ID = #{orderId}
+	</select>	
+	
+	
+	<select id="selectOrderer" resultType="MemberDto"  parameterType="String"  >
+		SELECT 
+				* 
+		FROM 
+				T_SHOPPING_MEMBER 
+		WHERE 
+				MEMBER_ID = #{memberId}
+	</select>	
+	
+</mapper>

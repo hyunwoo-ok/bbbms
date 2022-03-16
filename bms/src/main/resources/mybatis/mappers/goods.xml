@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.goods">
+
+	<resultMap type="hashmap" id="goodsMap">
+		<result column="GOODS_ID" 		 			property="goodsId" />
+		<result column="GOODS_TITLE" 	 			property="goodsTitle" />
+		<result column="GOODS_WRITER" 	 			property="goodsWriter" />
+		<result column="GOODS_PRICE" 	 			property="goodsPrice" />
+		<result column="GOODS_PUBLISHER" 	 		property="goodsPublisher" />
+		<result column="GOODS_SORT" 	 			property="goodsSort" />
+		<result column="GOODS_SALES_PRICE" 	 		property="goodsSalesPrice" />
+		<result column="GOODS_POINT" 	 			property="goodsPoint" />
+		<result column="GOODS_PUBLISHED_DATE" 	 	property="goodsPublishedDate" />
+		<result column="GOODS_TOTAL_PAGE" 	 		property="goodsTotalPage" />
+		<result column="GOODS_ISBN" 				property="goodsIsbn" />
+		<result column="GOODS_DELIVERY_PRICE" 	 	property="goodsDeliveryPrice" />
+		<result column="GOODS_DELIVERY_DATE" 	 	property="goodsDeliveryDate" />
+		<result column="GOODS_STATUS" 	 			property="goodsStatus" />
+		<result column="GOODS_WRITER_INTRO" 		property="goodsWriterIntro"      jdbcType="CLOB" javaType="java.lang.String"/>
+		<result column="GOODS_CONTENTS_ORDER" 	 	property="goodsContentsOrder" 	 jdbcType="CLOB" javaType="java.lang.String"/>
+		<result column="GOODS_INTRO" 	 			property="goodsIntro" 			 jdbcType="CLOB" javaType="java.lang.String"/>
+		<result column="GOODS_PUBLISHER_COMMENT" 	property="goodsPublisherComment" jdbcType="CLOB" javaType="java.lang.String"/>
+		<result column="GOODS_RECOMMENDATION" 	 	property="goodsRecommendation" 	 jdbcType="CLOB" javaType="java.lang.String"/>
+		<result column="GOODS_CREDATE" 		 		property="goodsCredate" />
+		<result column="FILE_NAME" 			 		property="goodsFileName" />
+	</resultMap>
+
+     <select id="selectGoodsList" parameterType="String" resultMap="goodsMap"   >
+		SELECT 
+   				G.GOODS_ID					AS GOODS_ID,
+   				G.GOODS_TITLE				AS GOODS_TITLE,
+   				G.GOODS_WRITER				AS GOODS_WRITER,
+   				G.GOODS_PRICE				AS GOODS_PRICE,
+   				G.GOODS_PUBLISHER			AS GOODS_PUBLISHER,
+   				G.GOODS_SORT				AS GOODS_SORT,
+   				G.GOODS_SALES_PRICE			AS GOODS_SALES_PRICE,
+   				G.GOODS_POINT				AS GOODS_POINT,
+   				G.GOODS_PUBLISHED_DATE		AS GOODS_PUBLISHED_DATE,
+   				G.GOODS_TOTAL_PAGE			AS GOODS_TOTAL_PAGE,
+   				G.GOODS_ISBN 				AS GOODS_ISBN,
+   				G.GOODS_DELIVERY_PRICE 		AS GOODS_DELIVERY_PRICE,
+   				G.GOODS_DELIVERY_DATE 		AS GOODS_DELIVERY_DATE,
+   				G.GOODS_STATUS 				AS GOODS_STATUS,
+   				G.GOODS_WRITER_INTRO 		AS GOODS_WRITER_INTRO,
+   				G.GOODS_CONTENTS_ORDER 		AS GOODS_CONTENTS_ORDER,
+   				G.GOODS_INTRO 				AS GOODS_INTRO,
+   				G.GOODS_PUBLISHER_COMMENT 	AS GOODS_PUBLISHER_COMMENT,
+   				G.GOODS_RECOMMENDATION 		AS GOODS_RECOMMENDATION,
+   				G.GOODS_CREDATE 			AS GOODS_CREDATE,
+   				D.FILE_NAME					AS FILE_NAME 
+   		FROM 
+   				T_SHOPPING_GOODS G 
+   					  INNER JOIN T_GOODS_DETAIL_IMAGE D
+  							  ON G.GOODS_ID = D.GOODS_ID 
+  							 AND D.FILE_TYPE = 'main_image' 
+  							 AND G.GOODS_STATUS = #{goodsStatus}
+       	ORDER BY 
+          			G.GOODS_CREDATE DESC
+
+	</select>
+	
+	<select id="selectGoodsDetail" parameterType="String" resultMap="goodsMap">
+	    SELECT 
+	    		G.GOODS_ID					AS GOODS_ID,
+   				G.GOODS_TITLE				AS GOODS_TITLE,
+   				G.GOODS_WRITER				AS GOODS_WRITER,
+   				G.GOODS_PRICE				AS GOODS_PRICE,
+   				G.GOODS_PUBLISHER			AS GOODS_PUBLISHER,
+   				G.GOODS_SORT				AS GOODS_SORT,
+   				G.GOODS_SALES_PRICE			AS GOODS_SALES_PRICE,
+   				G.GOODS_POINT				AS GOODS_POINT,
+   				G.GOODS_PUBLISHED_DATE		AS GOODS_PUBLISHED_DATE,
+   				G.GOODS_TOTAL_PAGE			AS GOODS_TOTAL_PAGE,
+   				G.GOODS_ISBN 				AS GOODS_ISBN,
+   				G.GOODS_DELIVERY_PRICE 		AS GOODS_DELIVERY_PRICE,
+   				G.GOODS_DELIVERY_DATE 		AS GOODS_DELIVERY_DATE,
+   				G.GOODS_STATUS 				AS GOODS_STATUS,
+   				G.GOODS_WRITER_INTRO 		AS GOODS_WRITER_INTRO,
+   				G.GOODS_CONTENTS_ORDER 		AS GOODS_CONTENTS_ORDER,
+   				G.GOODS_INTRO 				AS GOODS_INTRO,
+   				G.GOODS_PUBLISHER_COMMENT 	AS GOODS_PUBLISHER_COMMENT,
+   				G.GOODS_RECOMMENDATION 		AS GOODS_RECOMMENDATION,
+   				G.GOODS_CREDATE 			AS GOODS_CREDATE,
+   				D.FILE_NAME					AS FILE_NAME 
+	    FROM 
+	    		T_SHOPPING_GOODS G 
+	    		      INNER JOIN T_GOODS_DETAIL_IMAGE D
+        					  ON G.GOODS_ID = D.GOODS_ID 
+        					 AND D.FILE_TYPE = 'main_image'
+        					 AND G.GOODS_ID = #{goodsId}
+        ORDER BY 
+        		G.GOODS_ID
+	</select>
+	
+	<select id="selectGoodsDetailImage" parameterType="String"  resultType="ImageFileDto" >
+    	SELECT 
+				* 
+		FROM  
+				T_GOODS_DETAIL_IMAGE 
+		WHERE  
+				FILE_TYPE != 'main_image' AND GOODS_ID = #{goodsId}
+	</select>
+	
+    <select id="selectGoodsBySearchWord" parameterType="String" resultMap="goodsMap" >
+		SELECT 
+				G.GOODS_ID					AS GOODS_ID,
+   				G.GOODS_TITLE				AS GOODS_TITLE,
+   				G.GOODS_WRITER				AS GOODS_WRITER,
+   				G.GOODS_PRICE				AS GOODS_PRICE,
+   				G.GOODS_PUBLISHER			AS GOODS_PUBLISHER,
+   				G.GOODS_SORT				AS GOODS_SORT,
+   				G.GOODS_SALES_PRICE			AS GOODS_SALES_PRICE,
+   				G.GOODS_POINT				AS GOODS_POINT,
+   				G.GOODS_PUBLISHED_DATE		AS GOODS_PUBLISHED_DATE,
+   				G.GOODS_TOTAL_PAGE			AS GOODS_TOTAL_PAGE,
+   				G.GOODS_ISBN 				AS GOODS_ISBN,
+   				G.GOODS_DELIVERY_PRICE 		AS GOODS_DELIVERY_PRICE,
+   				G.GOODS_DELIVERY_DATE 		AS GOODS_DELIVERY_DATE,
+   				G.GOODS_STATUS 				AS GOODS_STATUS,
+   				G.GOODS_WRITER_INTRO 		AS GOODS_WRITER_INTRO,
+   				G.GOODS_CONTENTS_ORDER 		AS GOODS_CONTENTS_ORDER,
+   				G.GOODS_INTRO 				AS GOODS_INTRO,
+   				G.GOODS_PUBLISHER_COMMENT 	AS GOODS_PUBLISHER_COMMENT,
+   				G.GOODS_RECOMMENDATION 		AS GOODS_RECOMMENDATION,
+   				G.GOODS_CREDATE 			AS GOODS_CREDATE,
+   				D.FILE_NAME					AS FILE_NAME 
+		FROM 
+				T_SHOPPING_GOODS G
+				      INNER JOIN T_GOODS_DETAIL_IMAGE D
+	    					  ON G.GOODS_ID = D.GOODS_ID
+	    					 AND D.FILE_TYPE = 'main_image' 
+	    					 AND G.GOODS_TITLE LIKE '%'|| #{searchWord} || '%'
+	    ORDER BY 
+	    		G.GOODS_CREDATE DESC
+	</select>	
+	
+</mapper>

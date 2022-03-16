@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration 	PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+	<settings>
+		<setting name="mapUnderscoreToCamelCase" value="true"/>
+	</settings>
+	
+	<typeAliases>
+		<typeAlias type="com.bms.goods.dto.GoodsDto"     alias="GoodsDto" />
+		<typeAlias type="com.bms.goods.dto.ImageFileDto" alias="ImageFileDto" />
+		<typeAlias type="com.bms.member.dto.MemberDto"   alias="MemberDto" />
+		<typeAlias type="com.bms.order.dto.OrderDto"     alias="OrderDto" />
+		<typeAlias type="com.bms.mypage.dto.MyPageDto"   alias="MypageDto" />    
+	</typeAliases>
+	
+</configuration>
